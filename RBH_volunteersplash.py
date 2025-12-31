@@ -2,11 +2,12 @@
 import sys
 from datetime import datetime
 
-from PyQt6.QtCore import QSize,pyqtSignal,Qt,QStringListModel
+from PyQt6.QtCore import QSize,pyqtSignal,Qt,QStringListModel, QTimer
 from PyQt6.QtGui import QIcon, QFont
 from PyQt6.QtWidgets import QApplication,QComboBox, QPushButton, QVBoxLayout,QHBoxLayout, QWidget,QDialog, QLineEdit,QLabel, QMainWindow, QCheckBox, QCompleter, QSizePolicy
 import sqlite3
 import math
+from threading import Timer
 
 #create a global font class
 Font = QFont()
@@ -69,9 +70,10 @@ class RBHSISO(QDialog):#This is the Signin Signout Page
 	def VolunteerSignIn(self):
 		#Opens a VolunteerSignin pop up object as well as connecting it back to the parent with a function to do the signing in
 		self.NewSignInWindow = VolunteerSignIn(self.Curs,self.db)
-		self.NewSignInWindow.show()
 		self.NewSignInWindow.VolSignIn.connect(self.VolSignInComex) # Connect the dialog's signal to the parent's slot
+		self.NewSignInWindow.resize(self.size())
 		self.NewSignInWindow.exec() # Show the dialog as modal
+		
 	
 	def VolSignInComex(self,Name,Time): #This function takes the name and time from the sign in popup object and enters it into the database
 		if Name != "":
@@ -83,14 +85,14 @@ class RBHSISO(QDialog):#This is the Signin Signout Page
 				self.Curs.execute("INSERT INTO SISOLOG (Name, Date, Timein) VALUES (?, ?, ?)",[Name,Date,TimeOfDay])
 				self.db.commit()
 			else:
-				self.Warningwindow =WarningDialog("You are already signed in!")
-				self.Warningwindow.show()
+				self.Warningwindow =WarningDialog("You are already signed in!",0)
+				self.Warningwindow.resize(self.size())
 				self.Warningwindow.exec() 
 	
 	def VolunteerSignOut(self): #Opens a  VolunteerSignOut pop up object and connects it back to the parent to log information into the database
 		self.NewSignOutWindow = VolunteerSignOut(self.Curs,self.db)
-		self.NewSignOutWindow.show()
 		self.NewSignOutWindow.VolSignOut.connect(self.VolSignOutComex) # Connect the dialog's signal to the parent's slot
+		self.NewSignOutWindow.resize(self.size())
 		self.NewSignOutWindow.exec() # Show the dialog as modal
 	
 	def VolSignOutComex(self,Name,Time): #Takes the name and date from the VolunteerSignOut popup and enters the information into the most recent matching signin in the database
@@ -107,6 +109,7 @@ class RBHSISO(QDialog):#This is the Signin Signout Page
 		self.newClientSignOutWindow = ClientSignOut(self.Curs,self.db)
 		self.newClientSignOutWindow.showMaximized()
 		self.newClientSignOutWindow.ClientSignOut.connect(self.ClientSignOutComex) # Connect the dialog's signal to the parent's slot
+		self.newClientSignOutWindow.resize(self.size())
 		self.newClientSignOutWindow.exec() # Show the dialog as modal
 	
 	def ClientSignOutComex(self, Name, Date, HoursCount, Activity):#Adds the Client SignoutInformation into the database
@@ -129,7 +132,7 @@ class ClientSignOut(QDialog):#This is the splash screen for the client signout
 	def __init__(self,ClientCurs,ClientDB,parent=None):
 		super().__init__(parent)
 		
-		self.showMaximized()
+		
 		self.mailingListEntry = False
 		
 		self.ClientCurs = ClientCurs
@@ -239,7 +242,7 @@ class ClientSignOut(QDialog):#This is the splash screen for the client signout
 		
 		self.ClientSignOut.emit(self.Names.input.text(),self.date, self.Hours.input.text(), self.ClientActivities.currentText())
 		self.accept()
-		
+		 
 
 
 class VolunteerSignIn(QDialog):#This is the splash screen for Volunteer signin
@@ -248,7 +251,7 @@ class VolunteerSignIn(QDialog):#This is the splash screen for Volunteer signin
 	def __init__(self,VolsCurs,VolsDB,parent=None):
 		super().__init__(parent)
 		
-		self.showMaximized()
+		
 		self.ManualEntry = False
 		#This section opens the volunteers sqlite db and  pulls all the names from it
 		self.VolsCurs = VolsCurs
@@ -329,8 +332,8 @@ class VolunteerSignIn(QDialog):#This is the splash screen for Volunteer signin
 	
 	def New_Volunteer(self): #Pops up the NewVolunteerInformation poppup to add new information too can connect it to a the NEwNameSaved parent function
 		self.window = NewVolunteerInformation(self.VolsCurs,self.VolsDB)
-		self.window.show()
 		self.window.NewName.connect(self.NewNameSaved) # Connect the dialog's signal to the parent's slot
+		self.window.resize(self.size())
 		self.window.exec() # Show the dialog as modal
 	
 	def NewNameSaved(self,Name): #Takes info from the NewVolunteerInformation popup and pushes to sign in function(acceptentries)
@@ -353,10 +356,13 @@ class VolunteerSignIn(QDialog):#This is the splash screen for Volunteer signin
 		self.VolunteerName = self.CurrentVolunteers.currentText()
 		if self.VolunteerName in self.Names: #only sign in if the name entered is already in volunteer database
 			self.VolSignIn.emit(self.VolunteerName,self.RightNow)
+			self.YouSignedInwindow =WarningDialog("Thank you for signing in!",1.5)
+			self.YouSignedInwindow.resize(self.size())
+			self.YouSignedInwindow.exec()
 			self.accept()
 		else:
-			self.Warningwindow =WarningDialog("If you are a new volunteer please click 'New volunteer' otherwise please select from the dropdown")
-			self.Warningwindow.show()
+			self.Warningwindow =WarningDialog("If you are a new volunteer please click 'New volunteer' otherwise please select from the dropdown",0)
+			self.Warningwindow.resize(self.size())
 			self.Warningwindow.exec()
 	
 	def Back(self):	#exit dialog without commiting chanes
@@ -378,7 +384,7 @@ class VolunteerSignOut(QDialog):#This is the splash screen for Volunteer signOut
 	def __init__(self,VolsCurs,VolsDB, parent=None):
 		super().__init__(parent)
 		
-		self.showMaximized()
+		
 		#This section opens the volunteers sqlite db and  pulls all the names from it that signed in today and didn't sign out
 		self.VolsCurs = VolsCurs
 		self.VolsDB = VolsDB
@@ -446,8 +452,8 @@ class VolunteerSignOut(QDialog):#This is the splash screen for Volunteer signOut
 
 		
 		self.window = SignOutInfo(self.Volunteer,self.Hours,self.VolsCurs,self.VolsDB, self.Date)
-		self.window.show()
 		self.window.DoneFinished.connect(self.DoneComex)
+		self.window.resize(self.size())
 		self.window.exec() # Show the dialog as modal
 	
 	def DoneComex(self, Done):#done signing out close the window and pass data to the parent
@@ -488,9 +494,8 @@ class SignOutInfo(QDialog):#This is where activities are selected and informatio
 		self.date = date
 		self.Name = Name
 		super().__init__( parent)
-		self.showMaximized()
+		
 		self.setWindowTitle("Please select the activities worked on")
-#		self.resize(800, 200)
 		
 		ActivityList =["MoCo_bikes", "Terrific_kids_bikes", "Bikes_for_sale", "Client_Help", "Worked_on_my_bike"]
 		
@@ -586,8 +591,8 @@ class SignOutInfo(QDialog):#This is where activities are selected and informatio
 			self.DoneFinished.emit("Done")
 			self.accept()
 		else:
-			self.window =WarningDialog("The number of hours entered does not match the number of hours volunteered")
-			self.window.show()
+			self.window =WarningDialog("The number of hours entered does not match the number of hours volunteered",0)
+			self.window.resize(self.size())
 			self.window.exec() 
 			
 	
@@ -602,11 +607,12 @@ class SignOutInfo(QDialog):#This is where activities are selected and informatio
 	
 	
 		
-class WarningDialog(QDialog):#A more generic warning dialogue class with changeable messages
-	def __init__(self, WarnMessage, parent=None):
+class WarningDialog(QDialog):#A more generic warning dialogue class with changeable messages and a delayed close. Pass 0 or less for no autoclose
+	def __init__(self, WarnMessage,timeOut, parent=None):
+
 		super().__init__(parent)
+
 		self.setWindowTitle("")
-		self.showMaximized()
 		self.hoursMisMatch=QLabel(WarnMessage)
 		self.hoursMisMatch.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 		self.hoursMisMatch.setFont(Font)
@@ -624,12 +630,13 @@ class WarningDialog(QDialog):#A more generic warning dialogue class with changea
 		self.HourMisMatchLayout.addWidget(self.AckBtn, stretch =1)
 	
 		self.setLayout(self.HourMisMatchLayout)
+		if timeOut > 0:
+			QTimer.singleShot(timeOut*1000, self.accept)
 		
 	def Ack(self):#exit dialog
 		self.accept()
 	
-
-
+		
 class NewVolunteerInformation(QDialog):#This is where volunteers can register their information
 	NewName = pyqtSignal(str)
 	
