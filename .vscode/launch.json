@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run RBH_volunteersplash.py",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/RBH_volunteersplash.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    }
+  ]
+}
+
+

@@ -1,0 +1,25 @@
+{
+  // These directories are huge and not useful during editing
+  "files.watcherExclude": {
+    "**/build/**": true,
+    "**/dist/**": true,
+    "**/__pycache__/**": true
+  },
+  "search.exclude": {
+    "**/build/**": true,
+    "**/dist/**": true,
+    "**/__pycache__/**": true
+  },
+
+  // Prefer using the project-local venv when it exists.
+  // Cross-platform note: VS Code/Cursor will usually auto-detect `${workspaceFolder}/.venv`.
+  // If it doesn't, use "Python: Select Interpreter" and pick:
+  // - macOS/Linux: `${workspaceFolder}/.venv/bin/python`
+  // - Windows: `${workspaceFolder}\\.venv\\Scripts\\python.exe`
+  "python.terminal.activateEnvironment": true,
+
+  // Light-touch type checking todo: Is this doing anything?
+  "python.analysis.typeCheckingMode": "basic"
+}
+
+
