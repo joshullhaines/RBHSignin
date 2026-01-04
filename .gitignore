@@ -1,0 +1,16 @@
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# OS/editor noise
+.DS_Store
+
+# Packaging/build artifacts (currently tracked in git; ignoring prevents new churn)
+build/
+dist/
+
+
