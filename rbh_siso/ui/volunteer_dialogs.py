@@ -26,18 +26,15 @@ class VolunteerSignIn(QDialog):#This is the splash screen for Volunteer signin
 	VolSignIn = pyqtSignal(str,str)
 
 	def __init__(self,VolsCurs,VolsDB,parent=None):
+		"""
+		Initialize the VolunteerSignIn dialog.
+		"""
 		super().__init__(parent)
 		
-		
 		self.ManualEntry = False
-		#This section opens the volunteers sqlite db and  pulls all the names from it
 		self.VolsCurs = VolsCurs
 		self.VolsDB = VolsDB
-
-
-		
 		self.setWindowTitle("Volunteer Sign In")
-		# ~ self.resize(800, 200)
 		
 		# New colunteer button
 		self.NewVolBtn = QPushButton(
