@@ -53,50 +53,7 @@ class SignOutInfo(QDialog):
 
         self.layout = QVBoxLayout()
 
-        # Done
-        self.DoneBtn = QPushButton(
-            text="Done",
-            parent=self,
-        )
-        self.DoneBtn.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.DoneBtn.setFont(Font)
-        self.DoneBtn.clicked.connect(self.Done)
-
-        # BackButton
-        self.BackBtn = QPushButton(
-            text="Back",
-            parent=self,
-        )
-        self.BackBtn.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.BackBtn.setFont(Font)
-        self.BackBtn.clicked.connect(self.Back)
-
-        # Add Activity button
-        self.AddActBtn = QPushButton(
-            text="Add Activity",
-            parent=self,
-        )
-        self.AddActBtn.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.AddActBtn.setFont(Font)
-        self.AddActBtn.clicked.connect(self.AddAct)
-
-        self.TopButLayout = QHBoxLayout()
-        self.TopButLayout.addWidget(self.DoneBtn)
-        self.TopButLayout.addWidget(self.BackBtn)
-        self.TopButLayout.addWidget(self.AddActBtn)
-        self.layout.addLayout(
-            self.TopButLayout, stretch=1,
-        )
-
+        # Hours summary label at the top - shows total time volunteered
         self.NameAndHours = QLabel(
             "Hi " + self.Name
             + " you volunteered "
@@ -114,6 +71,7 @@ class SignOutInfo(QDialog):
             self.NameAndHours, stretch=2,
         )
 
+        # Create all 5 activity row widgets (shown/hidden as needed)
         self.activityNum = 1
         self.activity1 = ActivitySelect(ActivityList)
         self.activity2 = ActivitySelect(ActivityList)
@@ -131,34 +89,92 @@ class SignOutInfo(QDialog):
         self.NoMoreActivities.setAlignment(
             Qt.AlignmentFlag.AlignCenter,
         )
+        
+        # Add first activity row (always visible)
         self.layout.addWidget(
             self.activity1, stretch=4,
+        )
+
+        # Add Activity button - appears below activity rows
+        # Users click this to reveal additional activity rows
+        self.AddActBtn = QPushButton(
+            text="Add Activity",
+            parent=self,
+        )
+        self.AddActBtn.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.AddActBtn.setFont(Font)
+        self.AddActBtn.clicked.connect(self.AddAct)
+        self.layout.addWidget(self.AddActBtn, stretch=1)
+
+        # Done and Back buttons at the bottom
+        # Follows top-to-bottom data entry flow (matches Client Sign Out pattern)
+        self.DoneBtn = QPushButton(
+            text="Done",
+            parent=self,
+        )
+        self.DoneBtn.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.DoneBtn.setFont(Font)
+        self.DoneBtn.clicked.connect(self.Done)
+
+        self.BackBtn = QPushButton(
+            text="Back",
+            parent=self,
+        )
+        self.BackBtn.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.BackBtn.setFont(Font)
+        self.BackBtn.clicked.connect(self.Back)
+
+        self.BottomButLayout = QHBoxLayout()
+        self.BottomButLayout.addWidget(self.DoneBtn)
+        self.BottomButLayout.addWidget(self.BackBtn)
+        self.layout.addLayout(
+            self.BottomButLayout, stretch=1,
         )
 
         self.setLayout(self.layout)
 
     def AddAct(self):
-        """Add an activity option to the display."""
+        """
+        Add an activity option to the display.
+        
+        Inserts a new activity row before the "Add Activity" button,
+        maintaining the top-to-bottom data entry flow.
+        """
         self.activityNum += 1
+        
+        # Calculate insertion position: always insert before the button section
+        # Layout structure: [label, activities..., AddActBtn, BottomButLayout]
+        # Insert at count()-2 to place new activity before AddActBtn
+        insert_position = self.layout.count() - 2
+        
         if self.activityNum == 2:
-            self.layout.addWidget(
-                self.activity2, stretch=4,
+            self.layout.insertWidget(
+                insert_position, self.activity2, stretch=4,
             )
         elif self.activityNum == 3:
-            self.layout.addWidget(
-                self.activity3, stretch=4,
+            self.layout.insertWidget(
+                insert_position, self.activity3, stretch=4,
             )
         elif self.activityNum == 4:
-            self.layout.addWidget(
-                self.activity4, stretch=4,
+            self.layout.insertWidget(
+                insert_position, self.activity4, stretch=4,
             )
         elif self.activityNum == 5:
-            self.layout.addWidget(
-                self.activity5, stretch=4,
+            self.layout.insertWidget(
+                insert_position, self.activity5, stretch=4,
             )
         elif self.activityNum == 6:
-            self.layout.addWidget(
-                self.NoMoreActivities, stretch=4,
+            self.layout.insertWidget(
+                insert_position, self.NoMoreActivities, stretch=4,
             )
 
     def Done(self):
