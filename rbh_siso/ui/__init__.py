@@ -8,5 +8,3 @@ Split by domain:
 - activity dialogs
 - common shared widgets/dialogs
 """
-
-
