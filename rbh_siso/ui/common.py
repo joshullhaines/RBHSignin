@@ -100,6 +100,9 @@ class InformationInput(QWidget):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        # Limit vertical expansion on maximized windows
+        self.input.setMaximumHeight(60)
+        
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.prompt, stretch=2)
         self.layout.addWidget(self.input, stretch=5)

@@ -72,6 +72,7 @@ class ClientSignOut(QDialog):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        self.NewCliBtn.setMaximumHeight(80)
         self.NewCliBtn.clicked.connect(self.mailingList)
 
         # SignOutButton
@@ -84,6 +85,7 @@ class ClientSignOut(QDialog):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        self.SignOutBtn.setMaximumHeight(80)
         self.SignOutBtn.clicked.connect(self.SignOut)
 
         # BackButton
@@ -96,6 +98,7 @@ class ClientSignOut(QDialog):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        self.BackBtn.setMaximumHeight(80)
         self.BackBtn.clicked.connect(self.Back)
 
         # Time spent entry

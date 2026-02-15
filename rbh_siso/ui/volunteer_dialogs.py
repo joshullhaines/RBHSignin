@@ -56,6 +56,7 @@ class VolunteerSignIn(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.NewVolBtn.setFont(Font)
+        self.NewVolBtn.setMaximumHeight(80)
         self.NewVolBtn.clicked.connect(self.New_Volunteer)
 
         # SignInButton
@@ -68,6 +69,7 @@ class VolunteerSignIn(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.SignInBtn.setFont(Font)
+        self.SignInBtn.setMaximumHeight(80)
         self.SignInBtn.clicked.connect(self.AcceptEntries)
 
         # BackButton
@@ -80,6 +82,7 @@ class VolunteerSignIn(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.BackBtn.setFont(Font)
+        self.BackBtn.setMaximumHeight(80)
         self.BackBtn.clicked.connect(self.Back)
 
         # ForgotToSignButton
@@ -92,6 +95,7 @@ class VolunteerSignIn(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.ForgotToSignBtn.setFont(Font)
+        self.ForgotToSignBtn.setMaximumHeight(80)
         self.ForgotToSignBtn.clicked.connect(
             self.ForgotToSign,
         )
@@ -266,6 +270,7 @@ class VolunteerSignOut(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.SignOutBtn.setFont(Font)
+        self.SignOutBtn.setMaximumHeight(80)
         self.SignOutBtn.clicked.connect(self.SignOut)
 
         # BackButton
@@ -278,6 +283,7 @@ class VolunteerSignOut(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.BackBtn.setFont(Font)
+        self.BackBtn.setMaximumHeight(80)
         self.BackBtn.clicked.connect(self.Back)
 
         # Combo box listing volunteers from the database
@@ -391,8 +397,14 @@ class VolunteerSignOut(QDialog):
 
 
 class VolunteerSelect(QComboBox):
-    """A QComboBox populated with a list of volunteer
-    names."""
+    """
+    A QComboBox populated with a list of volunteer names.
+    
+    Features:
+    - Editable with autocomplete (typing filters the list)
+    - Styled dropdown arrow for better visibility on large screens
+    - Visible border to make the interactive area clear
+    """
 
     def __init__(self, nlist, parent=None):
         super().__init__(parent)
@@ -410,6 +422,36 @@ class VolunteerSelect(QComboBox):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        
+        # Limit vertical expansion on maximized windows for better proportions
+        self.setMaximumHeight(80)
+        
+        # Style the dropdown with a clean, minimal look
+        # The arrow is enlarged for visibility without visual clutter
+        self.setStyleSheet("""
+            QComboBox {
+                border: 2px solid #999;
+                border-radius: 4px;
+                padding: 8px;
+                padding-right: 50px;
+            }
+            QComboBox::drop-down {
+                width: 40px;
+                border: none;
+                background: transparent;
+            }
+            QComboBox::down-arrow {
+                width: 16px;
+                height: 16px;
+                image: url(none);
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 10px solid #555;
+            }
+            QComboBox:hover {
+                border: 2px solid #2196F3;
+            }
+        """)
         self.setFont(Font)
 
 
@@ -460,6 +502,7 @@ class NewVolunteerInformation(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.SaveBtn.setFont(Font)
+        self.SaveBtn.setMaximumHeight(80)
         self.SaveBtn.clicked.connect(self.AcceptEntries)
 
         self.BackBtn = QPushButton(
@@ -471,6 +514,7 @@ class NewVolunteerInformation(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.BackBtn.setFont(Font)
+        self.BackBtn.setMaximumHeight(80)
         self.BackBtn.clicked.connect(self.Back)
 
         self.layout = QVBoxLayout()

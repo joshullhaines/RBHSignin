@@ -65,6 +65,7 @@ class RBHSISO(QMainWindow):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        self.VolSignIn.setMaximumHeight(100)
         self.VolSignIn.clicked.connect(
             self.VolunteerSignIn,
         )
@@ -79,6 +80,7 @@ class RBHSISO(QMainWindow):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        self.VolSignOut.setMaximumHeight(100)
         self.VolSignOut.clicked.connect(
             self.VolunteerSignOut,
         )
@@ -98,6 +100,7 @@ class RBHSISO(QMainWindow):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
+        self.CliSignOut.setMaximumHeight(100)
         self.CliSignOut.clicked.connect(self.ClientSignOut)
 
         # Client buttons row

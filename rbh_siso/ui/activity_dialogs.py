@@ -13,6 +13,7 @@ DB tables touched:
 """
 
 from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QComboBox, QDialog, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QSizePolicy,
@@ -54,6 +55,7 @@ class SignOutInfo(QDialog):
         self.layout = QVBoxLayout()
 
         # Hours summary label at the top - shows total time volunteered
+        # This is prominently styled to prevent users from missing it and entering incorrect hours
         self.NameAndHours = QLabel(
             "Hi " + self.Name
             + " you volunteered "
@@ -63,7 +65,25 @@ class SignOutInfo(QDialog):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
-        self.NameAndHours.setFont(Font)
+        
+        # Create a larger, bold font for the hours label
+        hours_font = QFont(Font)
+        hours_font.setPointSize(28)  # Larger than the standard 20pt
+        hours_font.setBold(True)
+        self.NameAndHours.setFont(hours_font)
+        
+        # Add prominent styling with colored background and border
+        self.NameAndHours.setStyleSheet("""
+            QLabel {
+                background-color: #E3F2FD;
+                color: #1976D2;
+                padding: 20px;
+                border: 3px solid #2196F3;
+                border-radius: 8px;
+                font-weight: bold;
+            }
+        """)
+        
         self.NameAndHours.setAlignment(
             Qt.AlignmentFlag.AlignCenter,
         )
@@ -106,6 +126,7 @@ class SignOutInfo(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.AddActBtn.setFont(Font)
+        self.AddActBtn.setMaximumHeight(80)
         self.AddActBtn.clicked.connect(self.AddAct)
         self.layout.addWidget(self.AddActBtn, stretch=1)
 
@@ -120,6 +141,7 @@ class SignOutInfo(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.DoneBtn.setFont(Font)
+        self.DoneBtn.setMaximumHeight(80)
         self.DoneBtn.clicked.connect(self.Done)
 
         self.BackBtn = QPushButton(
@@ -131,6 +153,7 @@ class SignOutInfo(QDialog):
             QSizePolicy.Policy.Expanding,
         )
         self.BackBtn.setFont(Font)
+        self.BackBtn.setMaximumHeight(80)
         self.BackBtn.clicked.connect(self.Back)
 
         self.BottomButLayout = QHBoxLayout()
@@ -267,6 +290,7 @@ class ActivitySelect(QWidget):
             QSizePolicy.Policy.Expanding,
         )
         self.ActivitySelect.setFont(Font)
+        self.ActivitySelect.setMaximumHeight(80)
 
         self.hoursprompt = QLabel(
             'Hours worked', parent,
@@ -285,6 +309,7 @@ class ActivitySelect(QWidget):
             QSizePolicy.Policy.Expanding,
         )
         self.hoursinput.setFont(Font)
+        self.hoursinput.setMaximumHeight(60)
 
         self.hourslayout = QVBoxLayout()
         self.hourslayout.addWidget(
@@ -311,6 +336,7 @@ class ActivitySelect(QWidget):
             QSizePolicy.Policy.Expanding,
         )
         self.bikesinput.setFont(Font)
+        self.bikesinput.setMaximumHeight(60)
 
         self.bikeslayout = QVBoxLayout()
         self.bikeslayout.addWidget(
