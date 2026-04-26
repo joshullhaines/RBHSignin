@@ -46,12 +46,12 @@ jobs:
       - name: Rename Executable windows
         if: runner.os == 'Windows'
         run: |
-            mv dist/app.exe dist/app-windows.exe
+            mv dist/RBH_volunteersplash.exe dist/RBH_volunteersplash-windows.exe
 
       - name: Rename Executable windows
         if: runner.os == 'Linux'
         run: |
-            mv dist/app dist/app-linux
+            mv dist/RBH_volunteersplash dist/RBH_volunteersplash-linux
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
