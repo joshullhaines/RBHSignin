@@ -1,4 +1,7 @@
 #  modifying yaml from here https://dev.to/rahul_suryash/steps-to-build-binary-executables-for-python-code-with-github-actions-4k92
+permissions:
+  contents: write  # This allows the action to create releases and upload assets
+
 name: Build and Release Executables
 
 on:
@@ -26,22 +29,32 @@ jobs:
           python-version: '3.13'
           cache: 'pip'
 
-      - name: Install dependencies
+      - name: Install Windows Dependencies
+        if: runner.os == 'Windows'
         run: |
-          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-image0 libxcb-icccm4 libxcb-keysyms1 libxcb-render-util0 libxcb-xinerama0 libxcb-xinput0 libxcb-shape0 libxcb-xkb1 libxkbcommon-x11-0
           pip install -r requirements.txt
           pip install pyinstaller
 
       - name: Build executable
-        run: pyinstaller --onefile RBH_volunteersplash.py
+        run: pyinstaller --onefile -y RBH_volunteersplash.py
 
-      - name: Rename executable
+      - name: Rename Executable windows
+        if: runner.os == 'Windows'
         run: |
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            mv dist/app.exe dist/app-windows.exe
-          elif [[ "$RUNNER_OS" == "Linux" ]]; then
-            mv dist/app dist/app-linux
-        shell: bash
+            mv dist/RBH_volunteersplash.exe dist/RBH_volunteersplash-windows.exe
+
+      - name: Rename Executable windows
+        if: runner.os == 'Linux'
+        run: |
+            mv dist/RBH_volunteersplash dist/RBH_volunteersplash-linux
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -65,7 +78,7 @@ jobs:
         run: ls -R
 
       - name: Make files executable (Linux/Mac)
-        run: chmod +x app-* || true
+        run: chmod +x RBH_volunteersplash-* || true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -75,6 +88,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            app-linux
-            app-windows.exe
+            RBH_volunteersplash-linux
+            RBH_volunteersplash-windows.exe
                      
