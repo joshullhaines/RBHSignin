@@ -78,7 +78,7 @@ jobs:
         run: ls -R
 
       - name: Make files executable (Linux/Mac)
-        run: chmod +x app-* || true
+        run: chmod +x RBH_volunteersplash-* || true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
