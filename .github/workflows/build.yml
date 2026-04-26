@@ -33,7 +33,7 @@ jobs:
           pip install pyinstaller
 
       - name: Build executable
-        run: pyinstaller --onefile RBH_volunteersplash.py
+        run: pyinstaller --onefile -y RBH_volunteersplash.py
 
       - name: Rename executable
         run: |
