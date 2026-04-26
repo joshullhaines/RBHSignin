@@ -1,4 +1,7 @@
 #  modifying yaml from here https://dev.to/rahul_suryash/steps-to-build-binary-executables-for-python-code-with-github-actions-4k92
+permissions:
+  contents: write  # This allows the action to create releases and upload assets
+
 name: Build and Release Executables
 
 on:
