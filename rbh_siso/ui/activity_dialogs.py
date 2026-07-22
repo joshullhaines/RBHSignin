@@ -45,12 +45,20 @@ class SignOutInfo(QDialog):
         )
 
         ActivityList = [
-            "MoCo_bikes",
-            "Terrific_kids_bikes",
-            "Bikes_for_sale",
-            "Client_Help",
+            "TERRIFIC_Kids_Bike_Repair",
+            "TERRIFIC_Kids_Admin",
+            "MoCo_Bike_Repair",
+            "MoCo_Admin",
+            "Sale_Bike_Repair",
+            "Shop_admin",
+            "New_Volunteer_Orientation",
+            "Client_Assistance",
+            "Sale_Bike_Admin",
+            "Workshop_Instruction",
+            "Workshop_Admin",
             "Worked_on_my_bike",
         ]
+
 
         self.layout = QVBoxLayout()
 
