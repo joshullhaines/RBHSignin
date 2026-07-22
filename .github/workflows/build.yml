@@ -15,7 +15,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest] #removed macos-latest
+        os: [ubuntu-22.04, windows-latest] #removed macos-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -51,7 +51,7 @@ jobs:
         run: |
             mv dist/RBH_volunteersplash.exe dist/RBH_volunteersplash-windows.exe
 
-      - name: Rename Executable windows
+      - name: Rename Executable linux
         if: runner.os == 'Linux'
         run: |
             mv dist/RBH_volunteersplash dist/RBH_volunteersplash-linux
