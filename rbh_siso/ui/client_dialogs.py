@@ -118,12 +118,13 @@ class ClientSignOut(QDialog):
 
         # Activity selection
         self.ClientActivityList = [
-            "Client Activity",
-            "Independent Bike Repair/Maintenance",
-            "Assisted Bike Repair/Maintenance",
-            "Donating Parts",
-            "Donating Accessories",
-            "Donating Bike(s)",
+            "Client_Activity",
+            "Independent_Bike_Repair/Maintenance",
+            "Assisted_Bike_Repair/Maintenance",
+            "Attending_Workshop",
+            "Donating_Parts",
+            "Donating_Accessories",
+            "Donating_Bike(s)",
         ]
         self.ClientActivities = VolunteerSelect(
             self.ClientActivityList,
