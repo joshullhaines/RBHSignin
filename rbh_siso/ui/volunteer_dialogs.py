@@ -18,6 +18,7 @@ DB tables touched:
 
 import math
 from datetime import datetime
+import re
 
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
@@ -181,6 +182,36 @@ class VolunteerSignIn(QDialog):
 
     def AcceptEntries(self):
         """Send name and time back to add to database."""
+        if self.ManualEntry is True:
+            time_str = self.ManualTimeBox.input.text().strip()
+            
+            # Check if empty
+            if time_str == "": 
+                self.NoTimeEntered = WarningDialog(
+                    "Please enter a time, in the forgot to sign in box, otherwise click back", 5,
+                )
+                self.NoTimeEntered.resize(self.size())
+                self.NoTimeEntered.exec()
+                return
+                
+            # Validate strict military time formats
+            match_colon = re.match(r"^([01]\d|2[0-3]):([0-5]\d)$", time_str)
+            match_no_colon = re.match(r"^([01]\d|2[0-3])([0-5]\d)$", time_str)
+            
+            # If not XX:XX and not XXXX, ask gor valid time
+            if not match_colon and not match_no_colon:
+                self.InvalidTime = WarningDialog(
+                    "Please enter a valid military time (e.g., 08:30 or 1430).", 0,
+                )
+                self.InvalidTime.resize(self.size())
+                self.InvalidTime.exec()
+                return
+                
+            # If XXXX, change to XX:XX
+            if match_no_colon:
+                formatted_time = f"{match_no_colon.group(1)}:{match_no_colon.group(2)}"
+                self.ManualTimeBox.input.setText(formatted_time)        
+        
         if self.ManualEntry is False:
             self.RightNow = datetime.now().strftime(
                 '%Y-%m-%d %H:%M',
@@ -191,7 +222,8 @@ class VolunteerSignIn(QDialog):
                 self.ManualTimeBox.input.text(),
             )
             self.RightNow = " ".join(self.RightNowList)
-
+        
+			
         self.VolunteerName = (
             self.CurrentVolunteers.currentText()
         )
@@ -248,8 +280,7 @@ class VolunteerSignOut(QDialog):
         self.Date = datetime.now().strftime('%Y-%m-%d')
         res = VolsCurs.execute(
             "SELECT Name FROM SISOLOG"
-            " WHERE Date = ? AND TimeOut IS NULL",
-            [self.Date],
+            " WHERE TimeOut IS NULL",
         )
         NamesTup = res.fetchall()
         self.Names = []
@@ -333,15 +364,14 @@ class VolunteerSignOut(QDialog):
         )
         self.res = self.VolsCurs.execute(
             "SELECT Timein FROM SISOLOG"
-            " WHERE Name = ? AND Date = ?"
-            " AND TimeOut IS NULL",
-            [self.Volunteer, self.Date],
+            " WHERE Name = ? AND TimeOut IS NULL",
+            [self.Volunteer],
         )
         self.TimeinTup = self.res.fetchall()
         if not self.TimeinTup:
             self.window = WarningDialog(
                 "No active sign-in found for"
-                " this volunteer today.", 0,
+                " this volunteer.", 0,
             )
             self.window.resize(self.size())
             self.window.exec()
@@ -353,11 +383,21 @@ class VolunteerSignOut(QDialog):
         except Exception:
             self.window = WarningDialog(
                 "Stored sign-in time is invalid;"
-                " cannot compute hours.", 0,
+                " cannot compute hours."
+                "Removing previous sign in attempt, please sign in with forgot to sign in", 0,
             )
             self.window.resize(self.size())
             self.window.exec()
+            self.VolsCurs.execute(
+                "DELETE FROM SISOLOG WHERE Name = ? AND TimeOut IS NULL",
+                [self.Volunteer]
+            )
+            self.VolsDB.commit()
+            self.blockSignals(True)
+            self.close()
             return
+            
+            
         self.Timestrip = self.RightNow.split(" ")
         self.Timeout = datetime.strptime(
             self.Timestrip[1], '%H:%M',
