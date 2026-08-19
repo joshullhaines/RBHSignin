@@ -44,20 +44,25 @@ class SignOutInfo(QDialog):
             "Please select the activities worked on",
         )
 
-        ActivityList = [
-            "TERRIFIC_Kids_Bike_Repair",
-            "TERRIFIC_Kids_Admin",
-            "MoCo_Bike_Repair",
-            "MoCo_Admin",
-            "Sale_Bike_Repair",
-            "Shop_admin",
-            "New_Volunteer_Orientation",
-            "Client_Assistance",
-            "Sale_Bike_Admin",
-            "Workshop_Instruction",
-            "Workshop_Admin",
-            "Worked_on_my_bike",
+		#1 designates accepting bike count while 0 means N/A
+        MasterActivities = [
+            ("TERRIFIC_Kids_Bike_Repair", 1),
+            ("TERRIFIC_Kids_Admin", 0),
+            ("MoCo_Bike_Repair", 1),
+            ("MoCo_Admin", 0),
+            ("Sale_Bike_Repair", 1),
+            ("Shop_admin", 0),
+            ("New_Volunteer_Orientation", 0),
+            ("Client_Assistance", 0),
+            ("Sale_Bike_Admin", 0),
+            ("Workshop_Instruction", 0),
+            ("Workshop_Admin", 0),
+            ("Worked_on_my_bike", 0),
         ]
+
+        # Automatically generate both required structures from the master list
+        ActivityList = [item[0] for item in MasterActivities]
+        bike_activities = {item[0] for item in MasterActivities if item[1] == 1}
 
 
         self.layout = QVBoxLayout()
@@ -101,11 +106,11 @@ class SignOutInfo(QDialog):
 
         # Create all 5 activity row widgets (shown/hidden as needed)
         self.activityNum = 1
-        self.activity1 = ActivitySelect(ActivityList)
-        self.activity2 = ActivitySelect(ActivityList)
-        self.activity3 = ActivitySelect(ActivityList)
-        self.activity4 = ActivitySelect(ActivityList)
-        self.activity5 = ActivitySelect(ActivityList)
+        self.activity1 = ActivitySelect(ActivityList, bike_activities)
+        self.activity2 = ActivitySelect(ActivityList, bike_activities)
+        self.activity3 = ActivitySelect(ActivityList, bike_activities)
+        self.activity4 = ActivitySelect(ActivityList, bike_activities)
+        self.activity5 = ActivitySelect(ActivityList, bike_activities)
         self.NoMoreActivities = QLabel(
             "The max number of activities is reached",
         )
@@ -235,7 +240,12 @@ class SignOutInfo(QDialog):
                 self.activity4,
                 self.activity5,
             ]
-            for i in range(self.activityNum):
+            if self.activityNum < 5:
+                ActivitiesEntered = self.activityNum
+            else:
+                ActivitiesEntered = 5
+				
+            for i in range(ActivitiesEntered):
                 act = activities[i]
                 self.ActivityDatabaseWrite(
                     self.Name,
@@ -284,9 +294,10 @@ class ActivitySelect(QWidget):
     for entering information about each activity like
     hours worked, etc."""
 
-    def __init__(self, Activitylist, parent=None):
+    def __init__(self, Activitylist, bike_activities, parent=None):
         super().__init__(parent)
-
+		
+        self.bike_activities = bike_activities
         self.ActivitySelect = QComboBox()
         for Activity in Activitylist:
             self.ActivitySelect.addItem(Activity)
@@ -370,14 +381,11 @@ class ActivitySelect(QWidget):
     def ActivityChange(self):
         """Enable/disable bike count input based on
         selected activity."""
-        bike_activities = {
-            "MoCo_bikes",
-            "Terrific_kids_bikes",
-            "Bikes_for_sale",
-        }
+
         current = self.ActivitySelect.currentText()
-        if current in bike_activities:
+        if current in self.bike_activities:
             self.bikesinput.setReadOnly(False)
+            self.bikesinput.setText('')
         else:
             self.bikesinput.setReadOnly(True)
             self.bikesinput.clear()
