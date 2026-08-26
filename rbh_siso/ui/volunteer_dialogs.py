@@ -32,8 +32,76 @@ from rbh_siso.ui.common import (
 )
 from rbh_siso.ui.activity_dialogs import SignOutInfo
 
+class ForgotToSignFunctions:
+	"""This is a mixin class to share forgot to sign in button between main page and new volunteer page"""
 
-class VolunteerSignIn(QDialog):
+	def setup_forgot_to_sign_in(self):
+		"""Creates the forgot to sign in button. Call this in __init__."""
+		self.ManualEntry = False
+		self.ForgotToSignBtn = QPushButton(text="Forgot To Sign In", parent=self)
+		self.ForgotToSignBtn.setSizePolicy(
+			QSizePolicy.Policy.Expanding,
+			QSizePolicy.Policy.Expanding,
+		)
+		self.ForgotToSignBtn.setFont(Font)
+		self.ForgotToSignBtn.setMaximumHeight(80)
+		self.ForgotToSignBtn.clicked.connect(self.ForgotToSign)
+		return self.ForgotToSignBtn
+	
+	def ForgotToSign(self):
+		"""Set manual entry to true(if not already) and add input for
+		time."""
+		if getattr(self, 'ManualEntry', False):
+			return  # Prevent adding the box multiple times if clicked repeatedly
+			
+		self.ManualEntry = True
+	
+		# Time
+		self.ManualTimeBox = InformationInput(
+			"Time (military XX:XX)", self,
+		)
+		self.layout.addWidget(self.ManualTimeBox)
+	
+	def validate_and_get_time(self):
+		"""
+		Returns:
+		  - False if manual entry was not triggered.
+		  - None if validation failed (warning shown).
+		  - String (e.g., "14:30") if validation passed.
+		"""
+		if not getattr(self, 'ManualEntry', False):
+			return False
+	
+		time_str = self.ManualTimeBox.input.text().strip()
+		
+		if time_str == "": 
+			self.NoTimeEntered = WarningDialog(
+				"Please enter a time in the forgot to sign in box, otherwise click back", 5,
+			)
+			self.NoTimeEntered.resize(self.size())
+			self.NoTimeEntered.exec()
+			return None
+			
+		# Validate strict military time formats
+		match_colon = re.match(r"^([01]\d|2[0-3]):([0-5]\d)$", time_str)
+		match_no_colon = re.match(r"^([01]\d|2[0-3])([0-5]\d)$", time_str)
+		
+		if not match_colon and not match_no_colon:
+			self.InvalidTime = WarningDialog(
+				"Please enter a valid military time (e.g., 08:30 or 1430).", 0,
+			)
+			self.InvalidTime.resize(self.size())
+			self.InvalidTime.exec()
+			return None
+			
+		if match_no_colon:
+			formatted_time = f"{match_no_colon.group(1)}:{match_no_colon.group(2)}"
+			self.ManualTimeBox.input.setText(formatted_time)
+			return formatted_time
+			
+		return time_str
+        
+class VolunteerSignIn(QDialog, ForgotToSignFunctions):
     """Splash screen for Volunteer sign-in."""
 
     VolSignIn = pyqtSignal(str, str)
@@ -87,19 +155,7 @@ class VolunteerSignIn(QDialog):
         self.BackBtn.clicked.connect(self.Back)
 
         # ForgotToSignButton
-        self.ForgotToSignBtn = QPushButton(
-            text="Forgot To Sign In",
-            parent=self,
-        )
-        self.ForgotToSignBtn.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.ForgotToSignBtn.setFont(Font)
-        self.ForgotToSignBtn.setMaximumHeight(80)
-        self.ForgotToSignBtn.clicked.connect(
-            self.ForgotToSign,
-        )
+        self.ForgotToSignBtn = self.setup_forgot_to_sign_in()
 
         # Initialize the newvolinfo as none
         self.window = None
@@ -169,7 +225,7 @@ class VolunteerSignIn(QDialog):
         self.window.resize(self.size())
         self.window.exec()
 
-    def NewNameSaved(self, Name):
+    def NewNameSaved(self, Name, TimeStr):
         """Take info from the NewVolunteerInformation popup
         and push to sign-in (AcceptEntries)."""
         if Name != "":
@@ -178,48 +234,27 @@ class VolunteerSignIn(QDialog):
                 self.Names.append(Name)
 
             self.CurrentVolunteers.setCurrentText(Name)
+            
+            if TimeStr:
+                self.ForgotToSign() 
+                self.ManualTimeBox.input.setText(TimeStr)
             self.AcceptEntries()
 
     def AcceptEntries(self):
         """Send name and time back to add to database."""
-        if self.ManualEntry is True:
-            time_str = self.ManualTimeBox.input.text().strip()
-            
-            # Check if empty
-            if time_str == "": 
-                self.NoTimeEntered = WarningDialog(
-                    "Please enter a time, in the forgot to sign in box, otherwise click back", 5,
-                )
-                self.NoTimeEntered.resize(self.size())
-                self.NoTimeEntered.exec()
-                return
-                
-            # Validate strict military time formats
-            match_colon = re.match(r"^([01]\d|2[0-3]):([0-5]\d)$", time_str)
-            match_no_colon = re.match(r"^([01]\d|2[0-3])([0-5]\d)$", time_str)
-            
-            # If not XX:XX and not XXXX, ask gor valid time
-            if not match_colon and not match_no_colon:
-                self.InvalidTime = WarningDialog(
-                    "Please enter a valid military time (e.g., 08:30 or 1430).", 0,
-                )
-                self.InvalidTime.resize(self.size())
-                self.InvalidTime.exec()
-                return
-                
-            # If XXXX, change to XX:XX
-            if match_no_colon:
-                formatted_time = f"{match_no_colon.group(1)}:{match_no_colon.group(2)}"
-                self.ManualTimeBox.input.setText(formatted_time)        
+        validated_time = self.validate_and_get_time()
         
-        if self.ManualEntry is False:
+        if validated_time is None:
+            return    
+        
+        if validated_time is False:
             self.RightNow = datetime.now().strftime(
                 '%Y-%m-%d %H:%M',
             )
         else:
             self.RightNowList = (
                 datetime.now().strftime('%Y-%m-%d'),
-                self.ManualTimeBox.input.text(),
+                validated_time,
             )
             self.RightNow = " ".join(self.RightNowList)
         
@@ -252,18 +287,6 @@ class VolunteerSignIn(QDialog):
         """Exit dialog without committing changes."""
         self.VolSignIn.emit("", "")
         self.accept()
-
-    def ForgotToSign(self):
-        """Set manual entry to true and add input for
-        time."""
-        self.ManualEntry = True
-
-        # Time
-        self.ManualTimeBox = InformationInput(
-            "Time (military XX:XX)", self,
-        )
-        self.layout.addWidget(self.ManualTimeBox)
-
 
 class VolunteerSignOut(QDialog):
     """Splash screen for Volunteer sign-out."""
@@ -495,10 +518,10 @@ class VolunteerSelect(QComboBox):
         self.setFont(Font)
 
 
-class NewVolunteerInformation(QDialog):
+class NewVolunteerInformation(QDialog,ForgotToSignFunctions):
     """Where volunteers can register their information."""
 
-    NewName = pyqtSignal(str)
+    NewName = pyqtSignal(str, str)
 
     def __init__(self, VolsCurs, VolsDB, parent=None):
         super().__init__(parent)
@@ -556,6 +579,8 @@ class NewVolunteerInformation(QDialog):
         self.BackBtn.setFont(Font)
         self.BackBtn.setMaximumHeight(80)
         self.BackBtn.clicked.connect(self.Back)
+        
+        self.forgot_btn = self.setup_forgot_to_sign_in()
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.Name, stretch=3)
@@ -566,6 +591,7 @@ class NewVolunteerInformation(QDialog):
 
         self.BtnLayout = QHBoxLayout()
         self.BtnLayout.addWidget(self.SaveBtn)
+        self.BtnLayout.addWidget(self.forgot_btn)
         self.BtnLayout.addWidget(self.BackBtn)
         self.layout.addLayout(self.BtnLayout, stretch=1)
         self.setLayout(self.layout)
@@ -574,6 +600,10 @@ class NewVolunteerInformation(QDialog):
         """Check that critical info is provided, set empty
         optional fields to 'Not Entered', then write to
         database."""
+        validated_time = self.validate_and_get_time()
+        if validated_time is None:
+            return
+            
         if self.Name.input.text() != "":
             if self.Email.input.text() == "":
                 self.Email.input.setText("Not Entered")
@@ -598,10 +628,12 @@ class NewVolunteerInformation(QDialog):
             self.NewVolunteerName = (
                 self.Name.input.text()
             )
-            self.NewName.emit(self.NewVolunteerName)
+            time_str = validated_time if validated_time else "" 
+            """will be false if manual entry was false"""
+            self.NewName.emit(self.NewVolunteerName, time_str)
             self.accept()
 
     def Back(self):
         """Exit without committing changes."""
-        self.NewName.emit("")
+        self.NewName.emit("", "")
         self.accept()
