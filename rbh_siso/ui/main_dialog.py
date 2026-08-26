@@ -50,6 +50,15 @@ class RBHSISO(QMainWindow):
         self.db = connect("Information.db")
         self.Curs = self.db.cursor()
         ensure_schema(self.Curs)
+        
+        self.Curs.execute(
+            """
+            DELETE FROM SISOLOG 
+            WHERE (TimeOut IS NULL OR TimeOut = '') 
+            AND Date != date('now', 'localtime')
+            """
+        )
+        self.db.commit()
 
         # Create central widget (required for QMainWindow)
         central_widget = QWidget()
