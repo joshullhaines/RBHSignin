@@ -22,13 +22,13 @@ import re
 
 from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
-    QCheckBox, QComboBox, QCompleter, QDialog,
+    QComboBox, QCompleter, QDialog,
     QHBoxLayout, QLabel, QLineEdit, QPushButton,
     QSizePolicy, QVBoxLayout, QWidget,
 )
 
 from rbh_siso.ui.common import (
-    Font, InformationInput, WarningDialog,
+    Font, InformationInput, WarningDialog, CheckboxInput
 )
 from rbh_siso.ui.activity_dialogs import SignOutInfo
 
@@ -547,14 +547,7 @@ class NewVolunteerInformation(QDialog,ForgotToSignFunctions):
             "Address (optional)", self,
         )
         # Rockville Resident
-        self.RckVillRes = QCheckBox(
-            "Rockville Resident?", self,
-        )
-        self.RckVillRes.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.RckVillRes.setFont(Font)
+        self.RckVillRes= CheckboxInput("Rockville Resident?", self)
 
         self.SaveBtn = QPushButton(
             text="Save and Sign In",
@@ -584,7 +577,7 @@ class NewVolunteerInformation(QDialog,ForgotToSignFunctions):
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(self.Name, stretch=3)
-        self.layout.addWidget(self.RckVillRes, stretch=4)
+        self.layout.addWidget(self.RckVillRes, stretch=3)
         self.layout.addWidget(self.Email, stretch=3)
         self.layout.addWidget(self.Number, stretch=3)
         self.layout.addWidget(self.Address, stretch=3)

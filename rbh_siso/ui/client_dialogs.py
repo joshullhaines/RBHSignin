@@ -18,7 +18,7 @@ from PyQt6.QtWidgets import (
     QPushButton, QSizePolicy, QVBoxLayout,
 )
 
-from rbh_siso.ui.common import Font, InformationInput
+from rbh_siso.ui.common import Font, InformationInput, CheckboxInput
 from rbh_siso.ui.volunteer_dialogs import VolunteerSelect
 
 
@@ -107,14 +107,7 @@ class ClientSignOut(QDialog):
         )
 
         # Rockville Resident
-        self.RckVillRes = QCheckBox(
-            "Rockville Resident?", self,
-        )
-        self.RckVillRes.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.RckVillRes.setFont(Font)
+        self.RckVillRes= CheckboxInput("Rockville Resident?", self)
 
         # Activity selection
         self.ClientActivityList = [

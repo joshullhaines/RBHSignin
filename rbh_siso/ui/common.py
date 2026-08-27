@@ -9,7 +9,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QDialog, QHBoxLayout, QLabel, QLineEdit,
-    QPushButton, QSizePolicy, QVBoxLayout, QWidget,
+    QPushButton, QSizePolicy, QVBoxLayout, QWidget, QCheckBox
 )
 
 
@@ -107,3 +107,43 @@ class InformationInput(QWidget):
         self.layout.addWidget(self.prompt, stretch=2)
         self.layout.addWidget(self.input, stretch=5)
         self.setLayout(self.layout)
+
+class CheckboxInput(QWidget):
+    """A generic text prompt with a checkbox."""
+
+    def __init__(self, text, parent=None):
+        super().__init__(parent)
+
+        self.prompt = QLabel(text, parent)
+        self.prompt.setFont(Font)
+        self.prompt.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.prompt.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.checkbox = QCheckBox(parent)
+        self.checkbox.setFont(Font)
+        self.checkbox.setStyleSheet("""
+            QCheckBox::indicator {
+                width: 32px;
+                height: 32px;
+                border: 4px solid #555;
+                border-radius: 4px;
+                background: white;
+            }
+            QCheckBox::indicator:checked {
+                background: #2196F3;
+                border: 2px solid #2196F3;
+            }
+        """)
+
+        self.layout = QHBoxLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.addWidget(self.prompt, stretch=2)
+        self.layout.addWidget(self.checkbox, stretch=5)
+        self.setLayout(self.layout)
+
+    def isChecked(self):
+        """Pass-through method to easily check the state."""
+        return self.checkbox.isChecked()
