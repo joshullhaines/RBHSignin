@@ -39,7 +39,9 @@ class WarningDialog(QDialog):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
-        self.hoursMisMatch.setFont(Font)
+        MessageFont = QFont()
+        MessageFont.setPointSize(40)
+        self.hoursMisMatch.setFont(MessageFont)
         self.hoursMisMatch.setAlignment(
             Qt.AlignmentFlag.AlignCenter,
         )
