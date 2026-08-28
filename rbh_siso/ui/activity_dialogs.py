@@ -123,6 +123,51 @@ class SignOutInfo(QDialog):
             Qt.AlignmentFlag.AlignCenter,
         )
         
+        #Create and add column headers
+        self.activityprompt = QLabel(
+            'Activity', parent,
+        )
+        self.activityprompt.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.activityprompt.setFont(Font)
+        self.activityprompt.setMaximumHeight(60)
+        
+        self.bikesprompt = QLabel(
+            '# Bikes completed', parent,
+        )
+        self.bikesprompt.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.bikesprompt.setFont(Font)
+        self.bikesprompt.setMaximumHeight(60)
+        
+        self.hoursprompt = QLabel(
+            'Hours worked', parent,
+        )
+        self.hoursprompt.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding,
+        )
+        self.hoursprompt.setFont(Font)
+        self.hoursprompt.setMaximumHeight(60)
+        
+        self.prompts = QHBoxLayout()
+        self.prompts.addWidget(
+			self.activityprompt, stretch=2,
+		)
+        self.prompts.addWidget(
+			self.hoursprompt, stretch=2,
+		)
+        self.prompts.addWidget(
+			self.bikesprompt, stretch=2,
+		)
+			
+        self.layout.addLayout(
+            self.prompts, stretch=1,
+        )
         # Add first activity row (always visible)
         self.layout.addWidget(
             self.activity1, stretch=4,
@@ -311,44 +356,15 @@ class ActivitySelect(QWidget):
         self.ActivitySelect.setFont(Font)
         self.ActivitySelect.setMaximumHeight(80)
 
-        self.hoursprompt = QLabel(
-            'Hours worked', parent,
-        )
-        self.hoursprompt.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.hoursprompt.setFont(Font)
-        self.hoursprompt.setAlignment(
-            Qt.AlignmentFlag.AlignCenter,
-        )
+
         self.hoursinput = QLineEdit(parent)
         self.hoursinput.setSizePolicy(
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding,
         )
         self.hoursinput.setFont(Font)
-        self.hoursinput.setMaximumHeight(60)
-
-        self.hourslayout = QVBoxLayout()
-        self.hourslayout.addWidget(
-            self.hoursprompt, stretch=1,
-        )
-        self.hourslayout.addWidget(
-            self.hoursinput, stretch=3,
-        )
-
-        self.bikesprompt = QLabel(
-            'Bikes completed', parent,
-        )
-        self.bikesprompt.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding,
-        )
-        self.bikesprompt.setFont(Font)
-        self.bikesprompt.setAlignment(
-            Qt.AlignmentFlag.AlignCenter,
-        )
+        self.hoursinput.setMaximumHeight(60)   
+        
         self.bikesinput = QLineEdit(parent)
         self.bikesinput.setSizePolicy(
             QSizePolicy.Policy.Expanding,
@@ -357,23 +373,16 @@ class ActivitySelect(QWidget):
         self.bikesinput.setFont(Font)
         self.bikesinput.setMaximumHeight(60)
 
-        self.bikeslayout = QVBoxLayout()
-        self.bikeslayout.addWidget(
-            self.bikesprompt, stretch=1,
-        )
-        self.bikeslayout.addWidget(
-            self.bikesinput, stretch=3,
-        )
 
         self.layout = QHBoxLayout()
         self.layout.addWidget(
             self.ActivitySelect, stretch=2,
         )
-        self.layout.addLayout(
-            self.hourslayout, stretch=2,
+        self.layout.addWidget(
+            self.hoursinput, stretch=2,
         )
-        self.layout.addLayout(
-            self.bikeslayout, stretch=2,
+        self.layout.addWidget(
+            self.bikesinput, stretch=2,
         )
 
         self.setLayout(self.layout)
