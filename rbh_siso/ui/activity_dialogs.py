@@ -38,6 +38,7 @@ class SignOutInfo(QDialog):
         self.SOIDB = SOIdb
         self.date = date
         self.Name = Name
+        self.hoursEntered = 0
         super().__init__(parent)
 
         self.setWindowTitle(
@@ -72,7 +73,8 @@ class SignOutInfo(QDialog):
         self.NameAndHours = QLabel(
             "Hi " + self.Name
             + " you volunteered "
-            + str(hours) + " Hours",
+            + str(self.Hour) + " Hours. You currently have accounted for " 
+            + str(self.hoursEntered) + " Hours.",
         )
         self.NameAndHours.setSizePolicy(
             QSizePolicy.Policy.Expanding,
@@ -107,10 +109,15 @@ class SignOutInfo(QDialog):
         # Create all 5 activity row widgets (shown/hidden as needed)
         self.activityNum = 1
         self.activity1 = ActivitySelect(ActivityList, bike_activities)
+        self.activity1.hoursUpdated.connect(self.check_total_hours)
         self.activity2 = ActivitySelect(ActivityList, bike_activities)
+        self.activity2.hoursUpdated.connect(self.check_total_hours)
         self.activity3 = ActivitySelect(ActivityList, bike_activities)
+        self.activity3.hoursUpdated.connect(self.check_total_hours)
         self.activity4 = ActivitySelect(ActivityList, bike_activities)
+        self.activity4.hoursUpdated.connect(self.check_total_hours)
         self.activity5 = ActivitySelect(ActivityList, bike_activities)
+        self.activity5.hoursUpdated.connect(self.check_total_hours)
         self.NoMoreActivities = QLabel(
             "The max number of activities is reached",
         )
@@ -257,10 +264,8 @@ class SignOutInfo(QDialog):
             self.layout.insertWidget(
                 insert_position, self.NoMoreActivities, stretch=4,
             )
-
-    def Done(self):
-        """Check if hours add up, then emit done or warn
-        that hours don't match."""
+    def check_total_hours(self):
+        """Addup all the hours"""
         self.hoursEntered = 0
         self.HoursEnteredList = [
             self.activity1.hoursinput.text(),
@@ -274,7 +279,29 @@ class SignOutInfo(QDialog):
                 self.hoursEntered += float(text)
             except (ValueError, TypeError):
                 pass
-
+        self.NameAndHours.setText(
+            "Hi " + self.Name
+            + " you volunteered "
+            + str(self.Hour) + " Hours. You currently have accounted for " 
+            + str(self.hoursEntered) + " Hours.",
+        )
+		
+        if abs(self.hoursEntered - self.Hour) < 1e-9:
+           self.NameAndHours.setStyleSheet("""
+              QLabel {
+                  background-color: #D4F0DC;
+                  color: #2E7D32;
+                  padding: 20px;
+                  border: 3px solid #4CAF50;
+                  border-radius: 8px;
+                  font-weight: bold;
+              }
+            """)
+		
+		
+    def Done(self):
+        """Check if hours add up, then emit done or warn
+        that hours don't match."""
         if abs(self.hoursEntered - self.Hour) < 1e-9:
             # Write each activity into its respective DB
             # (only after validation passes)
@@ -338,10 +365,13 @@ class ActivitySelect(QWidget):
     """Takes in a list of activities and creates a space
     for entering information about each activity like
     hours worked, etc."""
-
+    
+    hoursUpdated = pyqtSignal()
+	
     def __init__(self, Activitylist, bike_activities, parent=None):
         super().__init__(parent)
-		
+        
+        self.HoursCount = 0
         self.bike_activities = bike_activities
         self.ActivitySelect = QComboBox()
         for Activity in Activitylist:
@@ -363,7 +393,8 @@ class ActivitySelect(QWidget):
             QSizePolicy.Policy.Expanding,
         )
         self.hoursinput.setFont(Font)
-        self.hoursinput.setMaximumHeight(60)   
+        self.hoursinput.setMaximumHeight(60)  
+        self.hoursinput.textChanged.connect(self.HoursChange)
         
         self.bikesinput = QLineEdit(parent)
         self.bikesinput.setSizePolicy(
@@ -399,3 +430,7 @@ class ActivitySelect(QWidget):
             self.bikesinput.setReadOnly(True)
             self.bikesinput.clear()
             self.bikesinput.setText('N/A')
+            
+    def HoursChange(self):
+        """Emits new hourscount"""
+        self.hoursUpdated.emit()     
